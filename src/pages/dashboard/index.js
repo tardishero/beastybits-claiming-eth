@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 import { useWeb3React } from "@web3-react/core";
 import config from "../../config/config";
 import CountUp from "react-countup";
-
+import { NotificationManager } from "react-notifications";
 import NFTCONTRACT_ABI from "../../assets/abis/NFTCONTRACT_ABI.json";
 import TOKENCONTRACT_ABI from "../../assets/abis/TOKENCONTRACT_ABI.json";
+import { CircleSpinner } from "react-spinners-kit";
 
 const ethers = require("ethers");
 
@@ -26,6 +27,8 @@ export default function DashBoard() {
   const [totalNftCounts, setTotalNftCounts] = useState(0);
   const [totalReward, setTotalReward] = useState(0);
   const [myBalanceOf, setMyBalanceOf] = useState(0);
+
+  const [startLoadingState, setStartLoadingState] = useState(false);
 
   const Provider = new ethers.providers.Web3Provider(window.ethereum);
   const Signer = Provider.getSigner();
@@ -79,7 +82,9 @@ export default function DashBoard() {
     );
 
     const myTokenAmount = await TOEKNCONTRACT.balanceOf(account);
-    setMyBalanceOf(myTokenAmount);
+    setMyBalanceOf(
+      Number(parseFloat(ethers.utils.formatEther(myTokenAmount)).toFixed(19))
+    );
   };
 
   useEffect(() => {
@@ -89,9 +94,26 @@ export default function DashBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
-  // const handleClaimFunc =async () => {
-  //   await NFTContract.claimRewards()
-  // }
+  const handleClaimFunc = async () => {
+    NotificationManager.success("Claim successfully!");
+
+    setStartLoadingState(true);
+    await NFTContract.claimRewards()
+      .then((tx) => {
+        tx.wait()
+          .then(() => {
+            setStartLoadingState(false);
+            NotificationManager.success("Claim successfully!");
+            getMydata();
+          })
+          .catch(() => {
+            NotificationManager.success("Claim error!");
+            setStartLoadingState(false);
+            getMydata();
+          });
+      })
+      .catch(() => {});
+  };
 
   return (
     <motion.section
@@ -99,36 +121,36 @@ export default function DashBoard() {
       animate={{ opacity: 1 }}
       transition={{ ease: "easeInOut", duration: 0.5, delay: 0.5 }}
     >
-      <div className="2xl:px-20 flex justify-between lg:px-10 mb-10 md:px-20 mt-10 px-5 sm:px-10 w-full z-50">
-        <div className="bg-custom-blur border-2 border-custom justify-between staking_content w-full">
-          <div className="lg:flex w-full">
+      <div className="z-50 flex justify-between w-full px-5 mt-10 mb-10 2xl:px-20 lg:px-10 md:px-20 sm:px-10">
+        <div className="justify-between w-full border-2 bg-custom-blur border-custom staking_content">
+          <div className="w-full lg:flex">
             <div className="grid grid-cols-2 lg:w-2/3">
-              <div className="border-b-2 border-custom border-r-2 w-full flex flex-col items-center justify-center">
-                <h1 className="sm:text-2xl text-indigo-500 text-left lg:text-3xl">
+              <div className="flex flex-col items-center justify-center w-full border-b-2 border-r-2 border-custom">
+                <h1 className="text-left text-indigo-500 sm:text-2xl lg:text-3xl">
                   Total NFT per class
                 </h1>
-                <h1 className=" sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   - <CountUp start={0} end={class1TypeNfts} duration={3} />{" "}
                   Lions
                 </h1>
-                <h1 className=" sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   - <CountUp start={0} end={class2TypeNfts} duration={3} />{" "}
                   Lions
                 </h1>
-                <h1 className=" sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   - <CountUp start={0} end={class3TypeNfts} duration={3} />{" "}
                   Lions
                 </h1>
-                <h1 className=" sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   - <CountUp start={0} end={class4TypeNfts} duration={3} />{" "}
                   Lions
                 </h1>
               </div>
-              <div className="border-b-2 border-custom w-full flex flex-col items-center justify-center">
-                <h1 className=" sm:text-2xl text-indigo-500 text-left lg:text-3xl">
+              <div className="flex flex-col items-center justify-center w-full border-b-2 border-custom">
+                <h1 className="text-left text-indigo-500 sm:text-2xl lg:text-3xl">
                   Rewards per class
                 </h1>
-                <h1 className="sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   -{" "}
                   <CountUp
                     start={0}
@@ -138,7 +160,7 @@ export default function DashBoard() {
                   />{" "}
                   beast
                 </h1>
-                <h1 className="sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   -{" "}
                   <CountUp
                     start={0}
@@ -148,7 +170,7 @@ export default function DashBoard() {
                   />{" "}
                   beast
                 </h1>
-                <h1 className="sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   -{" "}
                   <CountUp
                     start={0}
@@ -158,7 +180,7 @@ export default function DashBoard() {
                   />{" "}
                   beast
                 </h1>
-                <h1 className="sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   -{" "}
                   <CountUp
                     start={0}
@@ -169,49 +191,59 @@ export default function DashBoard() {
                   beast
                 </h1>
               </div>
-              <div className="border-b-2 border-custom border-r-2 lg:border-b-0 w-full flex items-center justify-center flex-col">
-                <h1 className="sm:text-2xl text-indigo-500 text-left lg:text-3xl">
+              <div className="flex flex-col items-center justify-center w-full border-b-2 border-r-2 border-custom lg:border-b-0">
+                <h1 className="text-left text-indigo-500 sm:text-2xl lg:text-3xl">
                   My beast Balance
                 </h1>
-                <h1 className="sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   <CountUp
                     start={0}
                     end={myBalanceOf}
                     duration={3}
-                    decimals={2}
+                    decimals={18}
                   />{" "}
                   beast
                 </h1>
               </div>
-              <div className="border-b-2 border-custom lg:border-b-0 w-full flex flex-col items-center justify-center">
-                <h1 className="sm:text-2xl text-indigo-500 text-left lg:text-3xl">
+              <div className="flex flex-col items-center justify-center w-full border-b-2 border-custom lg:border-b-0">
+                <h1 className="text-left text-indigo-500 sm:text-2xl lg:text-3xl">
                   Available for claim
                 </h1>
-                <h1 className="sm:text-4xl text-left text-lg text-white">
+                <h1 className="text-lg text-left text-white sm:text-4xl">
                   <CountUp
                     start={0}
                     end={totalReward}
                     duration={1}
-                    decimals={10}
+                    decimals={18}
                   />{" "}
                   beast
                 </h1>
                 {totalReward !== 0 && (
-                  <button className="px-10 py-3 bg-white my-4">Claim</button>
+                  <button
+                    className="px-10 py-3 my-4 transition-all duration-300 bg-white hover:bg-green-700"
+                    onClick={() => handleClaimFunc()}
+                  >
+                    Claim
+                  </button>
                 )}
               </div>
             </div>
-            <div className="border-custom md:border-l-2 lg:mt-0 lg:w-1/3 mt-10">
+            <div className="mt-10 border-custom md:border-l-2 lg:mt-0 lg:w-1/3">
               <Slider />
-              <div className="mt-10 text-center w-full">
-                <h1 className="sm:text-2xl text-white">Total NFTs</h1>
-                <h1 className="sm:text-5xl text-gray-500 text-lg">
+              <div className="w-full mt-10 text-center">
+                <h1 className="text-white sm:text-2xl">Total NFTs</h1>
+                <h1 className="text-lg text-gray-500 sm:text-5xl">
                   <CountUp start={0} end={totalNftCounts} duration={1} /> NFTs
                 </h1>
               </div>
             </div>
           </div>
         </div>
+        {startLoadingState && (
+          <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center w-full bg-black bg-opacity-80 backdrop-blur-lg">
+            <CircleSpinner color="white" />
+          </div>
+        )}
       </div>
     </motion.section>
   );
