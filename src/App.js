@@ -4,8 +4,9 @@ import AppFooter from "./component/footer";
 import Topbar from "./component/topbar";
 import DashBoard from "./pages/dashboard";
 
+import { ToastContainer } from "react-toastify";
+
 import { motion } from "framer-motion";
-import { NotificationContainer } from "react-notifications";
 import "./App.css";
 function App() {
   // const [preloadState, setPreloadState] = useState(true);
@@ -21,7 +22,7 @@ function App() {
       transition={{ ease: "easeInOut", duration: 0.5, delay: 0.1 }}
     >
       <div className="main-section">
-        <NotificationContainer />
+        <ToastContainer style={{ fontSize: 14 }} />
         <Router>
           <AppHeader />
           <Topbar />
