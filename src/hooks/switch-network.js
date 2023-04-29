@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/prefer-default-export
 export const switchSongbirdNetwork = async () => {
   const provider = window.ethereum;
-  const songbirdChainId = "0x72";
+  const songbirdChainId = "0x13";
 
   if (!provider) {
     // eslint-disable-next-line no-console
@@ -34,14 +34,14 @@ export const switchSongbirdNetwork = async () => {
               method: "wallet_addEthereumChain",
               params: [
                 {
-                  chainId: "0x72",
+                  chainId: "0x13",
                   chainName: "Songbird Network",
-                  rpcUrls: ["https://coston2-api.flare.network/ext/C/rpc"],
+                  rpcUrls: ["https://songbird-api.flare.network/ext/C/rpc"],
                   blockExplorerUrls: [
-                    "https://coston2-explorer.flare.network/",
+                    "https://songbird-explorer.flare.network/",
                   ],
                   nativeCurrency: {
-                    symbol: "C2FLR", // 2-6 characters long
+                    symbol: "SGB", // 2-6 characters long
                     decimals: 18,
                   },
                 },
